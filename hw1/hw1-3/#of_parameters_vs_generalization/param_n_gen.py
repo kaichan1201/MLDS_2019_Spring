@@ -96,7 +96,7 @@ def main():
 	parser.add_argument('--no-cuda',action='store_true',default=False,help='disables CUDA training')
 	parser.add_argument('--seed',type=int,default=1,metavar='S',help='random seed')
 	parser.add_argument('--log-interval',type=int,default=50,metavar='N',help='how many batches to wait before logging trainig status')
-	parser.add_argument('--save-model',action='store_true',default=False,help='For Saving the current Model')
+	parser.add_argument('--save-model',action='store_true',default=True,help='For Saving the current Model')
 
 	args = parser.parse_args()
 	use_cuda = not args.no_cuda and torch.cuda.is_available()
@@ -113,7 +113,7 @@ def main():
 	data_loader_train = Data.DataLoader(dataset=data_train,batch_size=args.batch_size,shuffle=True,**kwargs)
 	data_loader_test = Data.DataLoader(dataset=data_test,batch_size=args.batch_size,shuffle=True,**kwargs)
 
-	filter_1 = np.linspace(5,200,20) 
+	filter_1 = np.linspace(5,500,20) 
 	#filter_2 = np.linspace(50,150,5)
 
 	#for filter_n2 in filter_2:
