@@ -12,22 +12,34 @@ EPOCH = 1
 BATCH_SIZE = 64
 TIME_STEP = 100
 INPUT_SIZE = 4096
+VOCAB_SIZE = 10000
 HIDDEN_SIZE = VOCAB_SIZE
 LR = 0.01
 
 
 class Encoder(nn.Module):
-  def __init__(self, vocab_size, embedding_size, output_size):
+  def __init__(self):
     super(Encoder, self).__init__()
     
-    self.vocab_size = vocab_size
-    self.embedding = nn.Embedding(vocab_size, embedding_size)
-    self.LSTM_1 = nn.LSTM(input_size = INPUT_SIZE, hidden_size = HIDDEN_SIZE, num_layer=2)
-    self.LSTM_2 = nn.LSTM(input_size = HIDDEN_SIZE, hidden_size = HIDDEN_SIZE)
+    self.lstm1 = nn.LSTM(input_size = INPUT_SIZE, hidden_size = HIDDEN_SIZE)
+    self.lstm2 = nn.LSTM(input_size = 2 * HIDDEN_SIZE, hidden_size = VOCAB_SIZE)
    
-  def forward(self, input_seqs, input_lengths, hidden=None):
-    embedded = self.embedding(input_seqs)
-    packed = pack_padded_sequence(embedded, input_lengths)
-    packed_outputs, hidden = self.LSTM_1(packed, )
-    packed_outputs, hidden 
-
+  def forward(self, input_seqs):
+    mid, (hidden1, cell1) = self.lstm1(input_seqs)
+    outputs, (hidden2, cell2) = self.lstm2(mid, (hidden1, cell1))
+    
+    return outputs, (hidden1, cell1), (hidden2, cell2)
+  
+class Decoder(nn.Module):
+  def __init__(self):
+    super(Decoder, self).__init__()
+    
+    self.lstm1 = nn.LSTM(input_size = VOCAB_SIZE, hidden_size = HIDDEN_SIZE)
+    self.lstm2 = nn.LSTM(input_size = 2 * HIDDEN_SIZE, hidden_size = VOCAB_SIZE)
+   
+  def forward(self, input_seqs, hidden1, cell1, hidden2, cell2):
+    mid, _ = self.lstm1(input_seqs, (hidden1, cell1))
+    outputs, _ = self.lstm2(mid, (hidden2, cell2))
+    
+    return outputs
+  
