@@ -8,6 +8,10 @@ from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
 import torchvision.transforms as transforms
 import matplotlib.pyplot as plt
 
+import random
+import math
+import os
+
 EPOCH = 1
 BATCH_SIZE = 64
 TIME_STEP = 100
@@ -16,7 +20,10 @@ INPUT_SIZE = 4096
 VOCAB_SIZE = 10000
 HIDDEN_SIZE = VOCAB_SIZE
 LR = 0.01
+CLIP = 15
 
+
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 class Encoder(nn.Module):
   def __init__(self):
@@ -55,9 +62,90 @@ class Seq2Seq(nn.Module):
     
   def forward(self, src, target, bos_token):
     hidden, cell = self.encoder(src)
+    input = bos_token
     for t in range(1, SENTENCE_MAX_LEN):
       output, hidden, cell = self.decoder(input, hidden, cell)
       outputs[t] = output
       input = target[t]
       
     return outputs
+
+enc = Encoder()
+dec = Decoder()
+
+model = Seq2Seq(encoder,decoder).to(device)
+
+#count param
+def count_parametes(model):
+  return sum(p.numel() for p in model.parameters() if p.requires_grad)
+
+optimizer = optim.Adam(model.parameters(),lr= LR)
+
+#!
+loss_function = nn.CrossEntropyLoss()
+
+def train(model, iterator, loss_function, clip):
+  model.train()
+  epoch_loss = 0
+
+  for i, batch in enumerate(iterator):
+
+    src = batch.src
+    trg = batch.trg
+
+    optimizer.zero_grad()
+
+    output = model(src,trg)
+
+    output = output[:].view(-1, output.shape[-1])
+    trg = trg[:].view(-1)
+
+    loss = loss_function(output,trg)
+
+    loss.backward()
+
+    torch.nn.utils.clip_grad_norm_(model.parameters(), clip) #avoid explode
+
+    optimizer.step()
+
+    epoch_loss += loss.item()
+
+  return epoch_loss/len(iterator)
+
+
+def evaluate(model, iterator, loss_function, bos_token):
+  model.eval()
+  epoch_loss = 0
+
+  with torch.no_grad():
+
+    for i, batch in enumerate(iterator):
+
+      src = batch.src
+      trg = batch.trg
+
+      output = model(src,trg,bos_token):
+
+      output = output[:].view(-1, output.shape[-1])
+      trg = trg[:].view(-1)
+
+      loss = loss_function(output,trg)
+
+      epoch_loss += loss.item()
+
+    return epoch_loss/len(iterator)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
