@@ -73,16 +73,6 @@ class Seq2Seq(nn.Module):
       
     return outputs
 
-enc = Encoder()
-dec = Decoder()
-
-model = Seq2Seq(encoder,decoder).to(device)
-
-#count param
-def count_parametes(model):
-  return sum(p.numel() for p in model.parameters() if p.requires_grad)
-
-optimizer = optim.Adam(model.parameters(),lr= LR)
 
 #!
 loss_function = nn.CrossEntropyLoss()
@@ -152,34 +142,3 @@ def evaluate(model, iterator, loss_function, bos_token):
       epoch_loss += loss.item()
 
     return epoch_loss/len(iterator)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
