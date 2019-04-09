@@ -74,9 +74,6 @@ class Seq2Seq(nn.Module):
     return outputs
 
 
-#!
-loss_function = nn.CrossEntropyLoss()
-
 def train(model, iterator, loss_function, clip, vocab_size):
   model.train()
   epoch_loss = 0
