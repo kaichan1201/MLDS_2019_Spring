@@ -7,10 +7,13 @@ import torchvision.datasets as dsets
 from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
 import torchvision.transforms as transforms
 import matplotlib.pyplot as plt
+import tensorflow as tf
 
 import random
 import math
 import os
+
+from data_preprocessing import pad_sequences
 
 EPOCH = 1
 BATCH_SIZE = 64
@@ -29,8 +32,8 @@ class Encoder(nn.Module):
   def __init__(self):
     super(Encoder, self).__init__()
     
-    self.lstm1 = nn.LSTM(input_size = INPUT_SIZE, hidden_size = HIDDEN_SIZE, batch_first = True)
-    self.lstm2 = nn.LSTM(input_size = 2 * HIDDEN_SIZE, hidden_size = VOCAB_SIZE, batch_first = True)
+    self.lstm1 = nn.LSTM(input_size = INPUT_SIZE, hidden_size = HIDDEN_SIZE)
+    self.lstm2 = nn.LSTM(input_size = 2 * HIDDEN_SIZE, hidden_size = VOCAB_SIZE)
    
   def forward(self, input_seqs, pad_token):
     mid, (hidden1, cell1) = self.lstm1(input_seqs)
@@ -43,8 +46,8 @@ class Decoder(nn.Module):
   def __init__(self):
     super(Decoder, self).__init__()
     
-    self.lstm1 = nn.LSTM(input_size = INPUT_SIZE, hidden_size = HIDDEN_SIZE, batch_first = True)
-    self.lstm2 = nn.LSTM(input_size = 2 * HIDDEN_SIZE, hidden_size = VOCAB_SIZE, batch_first = True)
+    self.lstm1 = nn.LSTM(input_size = VOCAB_SIZE, hidden_size = HIDDEN_SIZE)
+    self.lstm2 = nn.LSTM(input_size = 2 * HIDDEN_SIZE, hidden_size = VOCAB_SIZE)
    
   def forward(self, input_word, hidden1, cell1, hidden2, cell2):
     mid, _ = self.lstm1(input_seqs, (hidden1, cell1))
@@ -84,7 +87,7 @@ optimizer = optim.Adam(model.parameters(),lr= LR)
 #!
 loss_function = nn.CrossEntropyLoss()
 
-def train(model, iterator, loss_function, clip):
+def train(model, iterator, loss_function, clip, vocab_size):
   model.train()
   epoch_loss = 0
 
@@ -92,15 +95,29 @@ def train(model, iterator, loss_function, clip):
 
     src = batch.src
     trg = batch.trg
+  
+    #padding 0
+    trg_pad = pad_sequences(trg)
+
+    #one_hotted
+    trg_one_hot_vec =[]
+    for sentence in trg_pad:
+      one_hot = torch.zeros(trg_pad.shape()[1], vocab_size).scatter(1,np.transpose(sentence),1)
+      trg_one_hot_vec.append(one_hot)
+
+
+    trg_one_hot_vec = np.asarray(trg_one_hot_vec) #numpy of numpy arrays
+    tensor_o_h_vec = tf.convert_to_tensor(trg_one_hot_vec) #tensor of numpy arrays
 
     optimizer.zero_grad()
 
-    output = model(src,trg)
+    output = model(src,tensor_o_h_vec)
 
     output = output[:].view(-1, output.shape[-1])
     trg = trg[:].view(-1)
 
-    loss = loss_function(output,trg)
+
+    loss = loss_function(output,trg_one_hot_vec)
 
     loss.backward()
 
@@ -113,6 +130,7 @@ def train(model, iterator, loss_function, clip):
   return epoch_loss/len(iterator)
 
 
+#non one hot yet
 def evaluate(model, iterator, loss_function, bos_token):
   model.eval()
   epoch_loss = 0
@@ -134,6 +152,22 @@ def evaluate(model, iterator, loss_function, bos_token):
       epoch_loss += loss.item()
 
     return epoch_loss/len(iterator)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
