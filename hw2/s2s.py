@@ -29,8 +29,8 @@ class Encoder(nn.Module):
   def __init__(self):
     super(Encoder, self).__init__()
     
-    self.lstm1 = nn.LSTM(input_size = INPUT_SIZE, hidden_size = HIDDEN_SIZE)
-    self.lstm2 = nn.LSTM(input_size = 2 * HIDDEN_SIZE, hidden_size = VOCAB_SIZE)
+    self.lstm1 = nn.LSTM(input_size = INPUT_SIZE, hidden_size = HIDDEN_SIZE, batch_first = True)
+    self.lstm2 = nn.LSTM(input_size = 2 * HIDDEN_SIZE, hidden_size = VOCAB_SIZE, batch_first = True)
    
   def forward(self, input_seqs, pad_token):
     mid, (hidden1, cell1) = self.lstm1(input_seqs)
@@ -43,8 +43,8 @@ class Decoder(nn.Module):
   def __init__(self):
     super(Decoder, self).__init__()
     
-    self.lstm1 = nn.LSTM(input_size = INPUT_SIZE, hidden_size = HIDDEN_SIZE)
-    self.lstm2 = nn.LSTM(input_size = 2 * HIDDEN_SIZE, hidden_size = VOCAB_SIZE)
+    self.lstm1 = nn.LSTM(input_size = INPUT_SIZE, hidden_size = HIDDEN_SIZE, batch_first = True)
+    self.lstm2 = nn.LSTM(input_size = 2 * HIDDEN_SIZE, hidden_size = VOCAB_SIZE, batch_first = True)
    
   def forward(self, input_word, hidden1, cell1, hidden2, cell2):
     mid, _ = self.lstm1(input_seqs, (hidden1, cell1))
