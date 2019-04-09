@@ -5,6 +5,7 @@ import random
 import torch
 import torch.utils.data as Data
 import data_preprocessing
+import s2s
 
 if __name__ == "__main__":
     np.random.seed(9487)
@@ -45,3 +46,14 @@ if __name__ == "__main__":
         shuffle = True,
         num_workers=2,
     )
+
+enc = Encoder()
+dec = Decoder()
+
+model = Seq2Seq(encoder,decoder).to(device)
+
+#count param
+def count_parametes(model):
+  return sum(p.numel() for p in model.parameters() if p.requires_grad)
+
+optimizer = optim.Adam(model.parameters(),lr= LR)
