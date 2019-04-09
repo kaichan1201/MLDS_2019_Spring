@@ -31,4 +31,17 @@ if __name__ == "__main__":
         video_feat_dict[video_ID] = video_feat
 
     x = video_feat_dict.values()
-    y = [my_caption[random.random() % len(my_caption)] for my_caption in video_caption_dict.values()]
+    pre_y = [captions[random.random() % len(captions)].split() for captions in video_caption_dict.values()]
+    y = []
+    for sentence in pre_y:
+        tokens = [word2index[word] for word in sentence]
+        y.append(tokens)
+    
+    torch_dataset = Data.TensorDataset(data_tensor = x, target_tensor = y)
+    
+    loader = Data.DataLoader(
+        dataset = torch_dataset,
+        batch_size = 64,
+        shuffle = True,
+        num_workers=2,
+    )
