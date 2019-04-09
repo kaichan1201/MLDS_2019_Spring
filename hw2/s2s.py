@@ -43,7 +43,7 @@ class Decoder(nn.Module):
   def __init__(self):
     super(Decoder, self).__init__()
     
-    self.lstm1 = nn.LSTM(input_size = VOCAB_SIZE, hidden_size = HIDDEN_SIZE)
+    self.lstm1 = nn.LSTM(input_size = INPUT_SIZE, hidden_size = HIDDEN_SIZE)
     self.lstm2 = nn.LSTM(input_size = 2 * HIDDEN_SIZE, hidden_size = VOCAB_SIZE)
    
   def forward(self, input_word, hidden1, cell1, hidden2, cell2):
