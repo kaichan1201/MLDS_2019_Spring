@@ -47,13 +47,16 @@ if __name__ == "__main__":
         num_workers=2,
     )
 
-enc = Encoder()
-dec = Decoder()
+    enc = Encoder()
+    dec = Decoder()
 
-model = Seq2Seq(encoder,decoder).to(device)
+    model = Seq2Seq(encoder,decoder).to(device)
 
-#count param
-def count_parametes(model):
-  return sum(p.numel() for p in model.parameters() if p.requires_grad)
+    #count param
+    def count_parametes(model):
+      return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
-optimizer = optim.Adam(model.parameters(),lr= LR)
+    optimizer = optim.Adam(model.parameters(),lr= LR)
+    loss_function = nn.CrossEntropyLoss()
+
+    train(model, loader, loss_function, CLIP, VOCAB_SIZE)
