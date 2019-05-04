@@ -45,13 +45,13 @@ if __name__ == "__main__":
     test_feat_filepaths = [(test_feat_folder + filename) for filename in test_feat_filenames] 
 
     #train
-    with open('video_IDs_tmp.obj','rb') as file:
+    with open('video_IDs.obj','rb') as file:
         video_IDs = pickle.load(file)
-    with open('word2index_tmp.obj','rb') as file:
+    with open('word2index.obj','rb') as file:
         word2index = pickle.load(file)
-    with open('index2word_tmp.obj','rb') as file:
+    with open('index2word.obj','rb') as file:
         index2word = pickle.load(file)
-    with open('video_caption_dict_tmp.obj','rb') as file:
+    with open('video_caption_dict.obj','rb') as file:
         video_caption_dict = pickle.load(file)
     with open('video_feat_dict.obj','rb') as file:
         video_feat_dict = pickle.load(file)

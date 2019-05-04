@@ -157,13 +157,13 @@ if __name__=="__main__":
     word2index, index2word, dictionary = build_dictionary(caption_corpus,min_count=3)
     #print(video_caption_dict)
 
-    with open('./word2index_trans.obj','wb') as file:
+    with open('./word2index.obj','wb') as file:
         pickle.dump(word2index,file,protocol=pickle.HIGHEST_PROTOCOL)
-    with open('./index2word_trans.obj','wb') as file:
+    with open('./index2word.obj','wb') as file:
         pickle.dump(index2word,file,protocol=pickle.HIGHEST_PROTOCOL)
-    with open('video_IDs_trans.obj', 'wb') as file:
+    with open('video_IDs.obj', 'wb') as file:
         pickle.dump(video_IDs,file,protocol=pickle.HIGHEST_PROTOCOL)
-    with open('video_caption_dict_trans.obj', 'wb') as file:
+    with open('video_caption_dict.obj', 'wb') as file:
         pickle.dump(video_caption_dict,file,protocol=pickle.HIGHEST_PROTOCOL)
-    with open('video_feat_dict_trans.obj', 'wb') as file:
+    with open('video_feat_dict.obj', 'wb') as file:
         pickle.dump(video_feat_dict,file,protocol=pickle.HIGHEST_PROTOCOL)
