@@ -1,0 +1,7 @@
+*.pkl
+*.npy
+*.pt
+*.obj
+*.txt
+*.model
+*.json
